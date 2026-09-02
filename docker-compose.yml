@@ -1,38 +1,19 @@
 version: '3.8'
 
 networks:
-  app-net:
+  microservices-net:
     driver: bridge
 
 volumes:
-  gpdata:
+  mongo-data:
 
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: db
+  mongo:
+    image: mongo:7
+    container_name: mongo
     networks:
-      - app-net
+      - microservices-net
+    ports:
+      - "27017:27017"
     volumes:
-      - gpdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: secret
-
-  api:
-    image: node:22-alpine
-    container_name: api
-    networks:
-      - app-net
-    environment:
-      DB_HOST: db
-    ports:
-      - "3000:3000"
-    command: tail -f /dev/null
-
-  web:
-    image: nginx:latest
-    container_name: web
-    networks:
-      - app-net
-    ports:
-      - "5000:5000"
+      - mongo-data:/data/db
